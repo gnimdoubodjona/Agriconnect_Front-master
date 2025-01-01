@@ -3,6 +3,7 @@ import { NgForm } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { UserRole, LoginCredentials, RegisterCredentials } from '../../models/auth';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-authentification',
@@ -10,10 +11,7 @@ import { UserRole, LoginCredentials, RegisterCredentials } from '../../models/au
   styleUrls: ['./authentification.component.css']
 })
 export class AuthentificationComponent {
-  
   @ViewChild('authForm') authForm!: NgForm;
-  
-
   
   isLoginMode = true;
   error = '';
@@ -33,7 +31,6 @@ export class AuthentificationComponent {
   get showProfileCompletion$() {
     return this.authService.showProfileCompletion$;
   }
-  
 
   toggleMode(): void {
     this.isLoginMode = !this.isLoginMode;
@@ -50,38 +47,46 @@ export class AuthentificationComponent {
     }
 
     if (this.isLoginMode) {
-      const loginCredentials: LoginCredentials = {
-        username: this.credentials.username,
-        password: this.credentials.password
-      };
-      
-      this.authService.login(loginCredentials).subscribe({
-        next: () => {
-          this.router.navigate(['/dashboard']);
+      this.authService.login(this.credentials).subscribe({
+        next: (response) => {
+          console.log('Connexion réussie:', response);
+          if (response.user.role === UserRole.Veterinaire && !response.user.profile_completed) {
+            // Si c'est un vétérinaire, rediriger vers le formulaire complet
+            this.router.navigate(['/veterinaire-profile']);
+          } else {
+            // Pour les autres rôles ou profils déjà complétés
+            this.router.navigate(['/dashboard']);
+          }
         },
         error: (error) => {
-          this.error = error.message || 'Une erreur est survenue lors de la connexion';
+          console.error('Erreur de connexion:', error);
+          this.error = error.error?.detail || 'Une erreur est survenue lors de la connexion';
         }
       });
     } else {
-      // Préparer les données d'inscription
-      const registerData = {
-        username: this.credentials.username,
-        password: this.credentials.password,
-        role: UserRole.Veterinaire  // Utiliser l'énumération au lieu d'une chaîne
-      };
-
-      this.authService.register(registerData).subscribe({
+      this.authService.register(this.credentials).subscribe({
         next: (response) => {
           console.log('Inscription réussie:', response);
-          // Stocke le token
-          localStorage.setItem('token', response.token);
-          // Rediriger vers la création du profil vétérinaire
-          this.router.navigate(['/veterinaire-profile']);
+          if (response.user.role === UserRole.Veterinaire) {
+            // Pour les vétérinaires, rediriger vers le formulaire complet
+            Swal.fire({
+              icon: 'success',
+              title: 'Inscription réussie!',
+              text: 'Veuillez compléter votre profil de vétérinaire.',
+              showConfirmButton: false,
+              timer: 2000
+            }).then(() => {
+              this.router.navigate(['/veterinaire-profile']);
+            });
+          } else {
+            // Pour les autres rôles, afficher le modal simple
+            this.authService.showProfileCompletion();
+            // Ne pas rediriger tant que le profil n'est pas complété
+          }
         },
         error: (error) => {
           console.error('Erreur d\'inscription:', error);
-          this.error = error.error?.error || 'Une erreur est survenue lors de l\'inscription';
+          this.error = error.error?.detail || 'Une erreur est survenue lors de l\'inscription';
         }
       });
     }

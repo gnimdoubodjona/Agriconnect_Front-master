@@ -12,49 +12,29 @@ import { map } from 'rxjs/operators';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit {
-  //username$: Observable<string | null>;
-  //isProfileMenuOpen = false;
-
-  //constructor(
-    //public authService: AuthService, 
-  //   private router: Router
-  // ) {
-  //   // S'abonner à l'utilisateur courant pour obtenir le nom d'utilisateur
-  //   this.username$ = this.authService.currentUser$.pipe(
-  //     map(user => user ? user.username : null)
-  //   );
-  // }
-
-  // ngOnInit(): void {}
-
-  // toggleProfileMenu() {
-  //   this.isProfileMenuOpen = !this.isProfileMenuOpen;
-  // }
-
-  // getInitials(username: string | null): string {
-  //   if (!username) return 'U';
-  //   return username.charAt(0).toUpperCase();
-  // }
-
-  // logout() {
-  //   this.isProfileMenuOpen = false;
-  //   this.authService.logout();
-  //   this.router.navigate(['/']); // Redirige vers la page d'accueil après déconnexion
-  // }
+  username$: Observable<string | null>;
+  isProfileMenuOpen = false;
   currentUser: any;
-  showProfileMenu = false;
 
   constructor(
-    private authService: AuthService,
+    public authService: AuthService, 
     private router: Router
-  ) {}
+  ) {
+    // S'abonner à l'utilisateur courant pour obtenir le nom d'utilisateur
+    this.username$ = this.authService.currentUser$.pipe(
+      map(user => user ? user.username : null)
+    );
+  }
 
-  ngOnInit() {
-    this.currentUser = this.authService.getCurrentUser();
+  ngOnInit(): void {
+    // Récupérer l'utilisateur actuel au chargement du composant
+    this.authService.currentUser$.subscribe(user => {
+      this.currentUser = user;
+    });
   }
 
   toggleProfileMenu() {
-    this.showProfileMenu = !this.showProfileMenu;
+    this.isProfileMenuOpen = !this.isProfileMenuOpen;
   }
 
   @HostListener('document:click', ['$event'])
@@ -62,23 +42,22 @@ export class HeaderComponent implements OnInit {
     const profileMenu = document.querySelector('.profile-menu');
     const profileButton = document.querySelector('.profile-button');
     
-    if (!profileMenu?.contains(event.target as Node) && 
-        !profileButton?.contains(event.target as Node)) {
-      this.showProfileMenu = false;
+    if (profileMenu && profileButton) {
+      if (!profileMenu.contains(event.target as Node) && 
+          !profileButton.contains(event.target as Node)) {
+        this.isProfileMenuOpen = false;
+      }
     }
   }
 
-  logout() {
-    this.authService.logout();
-    this.router.navigate(['/auth']);
+  getInitials(username: string | null): string {
+    if (!username) return 'U';
+    return username.charAt(0).toUpperCase();
   }
 
-  // Pour le changement de background des liens de navigation
-  // changeBackground(element: HTMLElement) {
-  //   const links = document.querySelectorAll('.flex a');
-  //   links.forEach(link => {
-  //     link.classList.remove('bg-gray-400');
-  //   });
-  //   element.classList.add('bg-gray-400');
-  // }
+  logout() {
+    this.isProfileMenuOpen = false;
+    this.authService.logout();
+    this.router.navigate(['/auth']); // Redirige vers la page d'authentification après déconnexion
+  }
 }

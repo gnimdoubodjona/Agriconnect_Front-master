@@ -32,12 +32,10 @@ export class AuthService {
     }
   }
 
-  // Méthode utilitaire pour vérifier si nous sommes dans un navigateur
   private isBrowser(): boolean {
     return isPlatformBrowser(this.platformId);
   }
 
-  // Méthode sécurisée pour accéder au localStorage
   private setLocalStorage(key: string, value: string): void {
     if (this.isBrowser()) {
       localStorage.setItem(key, value);
@@ -78,6 +76,7 @@ export class AuthService {
           this.setLocalStorage('token', response.token);
           this.setLocalStorage('currentUser', JSON.stringify(response.user));
           this.currentUserSubject.next(response.user);
+          // Afficher le modal de complétion de profil
           this.showProfileCompletionSubject.next(true);
         }
       })
@@ -88,6 +87,8 @@ export class AuthService {
     this.removeLocalStorage('token');
     this.removeLocalStorage('currentUser');
     this.currentUserSubject.next(null);
+    // Réinitialiser l'état du modal
+    this.showProfileCompletionSubject.next(false);
   }
 
   getToken(): string | null {
@@ -103,7 +104,29 @@ export class AuthService {
     return !!token;
   }
 
-  closeProfileCompletion() {
-    this.showProfileCompletionSubject.next(false);
+  // Méthodes pour gérer l'affichage du modal de complétion de profil
+  showProfileCompletion(): void {
+    this.showProfileCompletionSubject.next(true);
+  }
+
+  hideProfileCompletion(): void {
+    // Ne fermer le modal que si le profil est complété
+    const currentUser = this.getCurrentUser();
+    if (currentUser?.profile_completed) {
+      this.showProfileCompletionSubject.next(false);
+    }
+  }
+
+  closeProfileCompletion(): void {
+    // Ne fermer le modal que si le profil est complété
+    const currentUser = this.getCurrentUser();
+    if (currentUser?.profile_completed) {
+      this.hideProfileCompletion();
+    }
+  }
+
+  updateCurrentUser(user: User): void {
+    this.currentUserSubject.next(user);
+    this.setLocalStorage('currentUser', JSON.stringify(user));
   }
 }

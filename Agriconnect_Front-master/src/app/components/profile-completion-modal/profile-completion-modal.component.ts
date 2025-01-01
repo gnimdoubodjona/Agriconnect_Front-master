@@ -58,6 +58,16 @@ export class ProfileCompletionModalComponent implements OnInit {
   }
 
   closeModal() {
+    // Vérifier si les champs requis sont remplis
+    if (!this.formData.location || !this.formData.phoneNumber) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Action non autorisée',
+        text: 'Veuillez compléter votre profil avant de continuer.',
+        showConfirmButton: true
+      });
+      return;
+    }
     this.authService.closeProfileCompletion();
   }
 
