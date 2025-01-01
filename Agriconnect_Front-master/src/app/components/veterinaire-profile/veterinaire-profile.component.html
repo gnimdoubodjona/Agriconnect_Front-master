@@ -1,0 +1,85 @@
+<div class="profile-container">
+  <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
+    <h2>Complétez votre profil vétérinaire</h2>
+
+    <div class="form-group">
+      <label for="specialisation">Spécialisation</label>
+      <select id="specialisation" formControlName="specialisation">
+        <option value="">Sélectionnez une spécialisation</option>
+        <option *ngFor="let spec of specialisations" [value]="spec">
+          {{spec}}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="adresse">Adresse du cabinet</label>
+      <input id="adresse" type="text" formControlName="adresse">
+      <button type="button" (click)="getCurrentLocation()" class="location-btn">
+        <i class="fas fa-map-marker-alt"></i> Utiliser ma position actuelle
+      </button>
+    </div>
+
+    <div class="form-group">
+      <label for="experience">Années d'expérience</label>
+      <input id="experience" type="number" formControlName="experience">
+    </div>
+
+    <div class="form-group">
+      <label for="qualifications">Qualifications</label>
+      <textarea id="qualifications" formControlName="qualifications"></textarea>
+    </div>
+
+    <div class="disponibilite-section" formGroupName="disponibilites">
+      <h3>Disponibilités</h3>
+      <div class="jours-container">
+        <div class="jour-item">
+          <label>
+            <input type="checkbox" formControlName="lundi">
+            Lundi
+          </label>
+        </div>
+        <div class="jour-item">
+          <label>
+            <input type="checkbox" formControlName="mardi">
+            Mardi
+          </label>
+        </div>
+        <div class="jour-item">
+          <label>
+            <input type="checkbox" formControlName="mercredi">
+            Mercredi
+          </label>
+        </div>
+        <div class="jour-item">
+          <label>
+            <input type="checkbox" formControlName="jeudi">
+            Jeudi
+          </label>
+        </div>
+        <div class="jour-item">
+          <label>
+            <input type="checkbox" formControlName="vendredi">
+            Vendredi
+          </label>
+        </div>
+        <div class="jour-item">
+          <label>
+            <input type="checkbox" formControlName="samedi">
+            Samedi
+          </label>
+        </div>
+        <div class="jour-item">
+          <label>
+            <input type="checkbox" formControlName="dimanche">
+            Dimanche
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" [disabled]="!profileForm.valid" class="submit-btn">
+      Enregistrer le profil
+    </button>
+  </form>
+</div>

@@ -1,0 +1,377 @@
+/* Styles pour la section de recherche */
+.search-section {
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Conteneur de la barre de recherche */
+.search-bar-container {
+    background: #f8f9fa;
+    padding: 20px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+/* Style du formulaire de recherche */
+.search-form {
+    width: 100%;
+}
+
+.search-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+}
+
+/* Champs de recherche */
+.search-field {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+}
+
+.search-field i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+}
+
+.search-field .form-control {
+    padding: 12px 12px 12px 35px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 100%;
+}
+
+/* Style spécifique pour le champ de localisation */
+.location-field {
+    flex: 2;
+}
+
+.location-inputs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn-location {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-location:hover {
+    background: #218838;
+}
+
+.btn-location.active {
+    background: #1e7e34;
+}
+
+/* Groupe de coordonnées */
+.location-details {
+    display: flex;
+    gap: 10px;
+    flex: 1;
+}
+
+.coordinates-group {
+    display: flex;
+    gap: 10px;
+    flex: 2;
+}
+
+.radius-input {
+    flex: 1;
+}
+
+/* Messages d'état */
+.status-message {
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.loading {
+    background: #cce5ff;
+    color: #004085;
+}
+
+.error {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Grille des résultats */
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px 0;
+}
+
+/* Carte vétérinaire */
+.vet-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 20px;
+    transition: transform 0.3s;
+}
+
+.vet-card:hover {
+    transform: translateY(-5px);
+}
+
+/* En-tête de la carte */
+.vet-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.vet-icon {
+    font-size: 24px;
+    color: #28a745;
+}
+
+.disponibilite-badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    background: #dc3545;
+    color: white;
+}
+
+.disponibilite-badge.disponible {
+    background: #28a745;
+}
+
+/* Informations du vétérinaire */
+.vet-info p {
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.vet-info i {
+    color: #6c757d;
+    width: 20px;
+}
+
+/* Section qualifications */
+.vet-qualifications {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e9ecef;
+}
+
+.vet-qualifications h4 {
+    color: #343a40;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Boutons d'action */
+.vet-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: background-color 0.3s;
+}
+
+.btn-contact {
+    background: #17a2b8;
+    color: white;
+}
+
+.btn-rdv {
+    background: #28a745;
+    color: white;
+}
+
+.btn-contact:hover {
+    background: #138496;
+}
+
+.btn-rdv:hover {
+    background: #218838;
+}
+
+/* Message pas de résultats */
+.no-results {
+    text-align: center;
+    padding: 40px;
+    color: #6c757d;
+}
+
+.no-results i {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .search-wrapper {
+        flex-direction: column;
+    }
+    
+    .search-field {
+        width: 100%;
+    }
+    
+    .location-inputs {
+        flex-direction: column;
+    }
+    
+    .coordinates-group {
+        flex-direction: column;
+    }
+}
+
+.search-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.search-form {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
+.search-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.location-group {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 4px;
+}
+
+.location-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.location-inputs {
+  display: grid;
+  gap: 1rem;
+}
+
+.coordinates {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.results-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.veterinaire-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.veterinaire-card h3 {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+}
+
+.veterinaire-card p {
+  margin: 0.5rem 0;
+}
+
+.qualifications {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.alert {
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.alert-info {
+  background: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+.alert-danger {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}

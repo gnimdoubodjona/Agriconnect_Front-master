@@ -1,0 +1,15 @@
+<div class="prestataires-container">
+    <h2>Prestataires de Services</h2>
+    <div class="prestataires-grid">
+      <div *ngFor="let prestataire of prestataires" class="prestataire-card">
+        <h3>{{ prestataire.utilisateur.username }}</h3>
+        <div class="service-info">
+          <h4>Service proposé:</h4>
+          <p>{{ prestataire.service.nomService }}</p>
+          <p>{{ prestataire.service.description }}</p>
+        </div>
+        <button class="contact-btn">Contacter</button>
+      </div>
+    </div>
+  </div>
+`,

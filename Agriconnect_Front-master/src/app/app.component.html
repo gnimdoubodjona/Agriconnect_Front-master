@@ -1,0 +1,18 @@
+<!--<app-header *ngIf="shouldShowHeaderFooter"></app-header>
+
+<main>
+  <router-outlet></router-outlet>
+  <app-profile-completion-modal *ngIf="showProfileModal"></app-profile-completion-modal>
+</main>
+
+<app-footer *ngIf="shouldShowHeaderFooter"></app-footer>-->
+
+<app-header></app-header>
+<app-aside1></app-aside1>
+
+<app-main>
+  <app-body></app-body>
+  <app-profile-completion-modal *ngIf="showProfileModal"></app-profile-completion-modal>
+  <router-outlet></router-outlet>
+</app-main>
+

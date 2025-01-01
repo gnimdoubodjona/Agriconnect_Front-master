@@ -1,0 +1,84 @@
+<!-- profile-completion-modal.component.html -->
+<div class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Compléter le profil</h2>
+      <button class="close-button" (click)="closeModal()">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="progress-container">
+        <div class="progress-bar" [style.width.%]="getProgressPercentage()"></div>
+      </div>
+    </div>
+
+    <div class="modal-body">
+      <form #profileForm="ngForm" (ngSubmit)="submitProfile()">
+        <!-- Photo de profil -->
+        <div class="form-group mb-4">
+          <label>Photo de profil</label>
+          <div class="profile-photo-upload" [class.has-photo]="formData.profilePhoto">
+            <div class="photo-preview" *ngIf="formData.profilePhoto">
+              <img [src]="formData.profilePhoto ? (formData.profilePhoto | fileUrl) : ''" 
+                   alt="Preview" 
+                   class="preview-image"/>
+              <button type="button" class="btn btn-danger btn-sm remove-photo" (click)="removePhoto()">
+                <i class="fas fa-times"></i> Supprimer
+              </button>
+            </div>
+            <div *ngIf="!formData.profilePhoto" class="upload-placeholder">
+              <label class="upload-label">
+                <input type="file" 
+                       (change)="onFileSelected($event)" 
+                       accept="image/*" 
+                       class="hidden-input">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <span>Cliquez pour ajouter une photo</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Informations de contact -->
+        <div class="form-group mb-3">
+          <label for="location">Localisation *</label>
+          <div class="input-group">
+            <input type="text"
+                   class="form-control"
+                   id="location"
+                   name="location"
+                   [(ngModel)]="formData.location"
+                   required
+                   placeholder="Votre ville">
+            <span class="input-group-text">
+              <i class="fas fa-map-marker-alt"></i>
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group mb-4">
+          <label for="phoneNumber">Numéro de téléphone *</label>
+          <div class="input-group">
+            <input type="tel"
+                   class="form-control"
+                   id="phoneNumber"
+                   name="phoneNumber"
+                   [(ngModel)]="formData.phoneNumber"
+                   required
+                   placeholder="+237 6XX XX XX XX">
+            <span class="input-group-text">
+              <i class="fas fa-phone"></i>
+            </span>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" 
+                  class="btn btn-primary" 
+                  [disabled]="!profileForm.form.valid">
+            <i class="fas fa-save"></i> Enregistrer
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

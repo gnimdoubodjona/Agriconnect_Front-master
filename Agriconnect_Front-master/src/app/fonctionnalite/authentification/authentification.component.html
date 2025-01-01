@@ -1,0 +1,82 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h2>{{ isLoginMode ? 'Bienvenue' : 'Rejoignez-nous' }}</h2>
+      <p class="auth-subtitle">{{ isLoginMode ? 'Connectez-vous à votre compte' : 'Créez votre compte vétérinaire' }}</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #authForm="ngForm" class="auth-form">
+      <!-- Nom d'utilisateur -->
+      <div class="form-group">
+        <label for="username">
+          <i class="fas fa-user"></i>
+          Nom d'utilisateur
+        </label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          [(ngModel)]="credentials.username"
+          placeholder="Entrez votre nom d'utilisateur"
+          required
+          class="form-control"
+          #usernameInput="ngModel"
+        >
+        <div class="error-message" *ngIf="usernameInput.invalid && usernameInput.touched">
+          Le nom d'utilisateur est requis
+        </div>
+      </div>
+
+      <!-- Mot de passe -->
+      <div class="form-group">
+        <label for="password">
+          <i class="fas fa-lock"></i>
+          Mot de passe
+        </label>
+        <div class="password-wrapper">
+          <input
+            [type]="passwordVisible ? 'text' : 'password'"
+            id="password"
+            name="password"
+            [(ngModel)]="credentials.password"
+            placeholder="Entrez votre mot de passe"
+            required
+            minlength="6"
+            class="form-control"
+            #passwordInput="ngModel"
+          >
+          <span class="toggle-password" (click)="togglePasswordVisibility()">
+            <i [class]="passwordVisible ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+          </span>
+        </div>
+        <div class="error-message" *ngIf="passwordInput.invalid && passwordInput.touched">
+          <span *ngIf="passwordInput.errors?.['required']">Le mot de passe est requis</span>
+          <span *ngIf="passwordInput.errors?.['minlength']">Le mot de passe doit contenir au moins 6 caractères</span>
+        </div>
+      </div>
+
+      <!-- Message d'erreur global -->
+      <div class="error-message" *ngIf="error">
+        {{ error }}
+      </div>
+
+      <!-- Bouton de soumission -->
+      <button type="submit" class="submit-btn" [disabled]="!authForm.valid">
+        <i class="fas" [class.fa-sign-in-alt]="isLoginMode" [class.fa-user-plus]="!isLoginMode"></i>
+        {{ isLoginMode ? 'Se connecter' : "S'inscrire" }}
+      </button>
+
+      <!-- Lien de changement de mode -->
+      <div class="mode-toggle">
+        <p>
+          {{ isLoginMode ? "Vous n'avez pas de compte ?" : "Vous avez déjà un compte ?" }}
+          <button type="button" class="mode-switch" (click)="toggleMode()">
+            {{ isLoginMode ? "S'inscrire" : 'Se connecter' }}
+          </button>
+        </p>
+      </div>
+    </form>
+  </div>
+</div>
+
+<app-profile-completion-modal *ngIf="showProfileCompletion$ | async"></app-profile-completion-modal>
