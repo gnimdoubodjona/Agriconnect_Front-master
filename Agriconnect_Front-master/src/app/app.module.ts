@@ -25,6 +25,7 @@ import { Aside2Component } from './main/aside2/aside2.component';
 @NgModule({
   declarations: [
     AppComponent,
+    ProfileCompletionModalComponent,
     //LoginComponent,
     //RegisterComponent,
     UnauthorizedComponent,
@@ -32,7 +33,6 @@ import { Aside2Component } from './main/aside2/aside2.component';
     BodyComponent,
     FooterComponent,
     VeterinaireSearchComponent,
-    ProfileCompletionModalComponent,
     VeterinaireProfileComponent,
     AuthentificationComponent,
     DashboardComponent,

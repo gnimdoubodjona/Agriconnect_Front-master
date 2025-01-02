@@ -1,81 +1,92 @@
 <!-- profile-completion-modal.component.html -->
-<div class="modal-overlay" (click)="closeModal()">
+<div class="modal-overlay">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Compléter le profil</h2>
-      <button class="close-button" (click)="closeModal()">
-        <i class="fas fa-times"></i>
-      </button>
+      <h2>Compléter votre profil</h2>
       <div class="progress-container">
-        <div class="progress-bar" [style.width.%]="getProgressPercentage()"></div>
+        <div class="progress-bar" [style.width.%]="getProgressPercentage()">
+          {{ getProgressPercentage() }}%
+        </div>
       </div>
     </div>
 
     <div class="modal-body">
-      <form #profileForm="ngForm" (ngSubmit)="submitProfile()">
+      <form #profileForm="ngForm" (ngSubmit)="onSubmit()">
         <!-- Photo de profil -->
-        <div class="form-group mb-4">
+        <div class="form-group">
           <label>Photo de profil</label>
-          <div class="profile-photo-upload" [class.has-photo]="formData.profilePhoto">
-            <div class="photo-preview" *ngIf="formData.profilePhoto">
-              <img [src]="formData.profilePhoto ? (formData.profilePhoto | fileUrl) : ''" 
-                   alt="Preview" 
+          <div class="profile-photo-container">
+            <div class="photo-preview" *ngIf="formData.profile_photo">
+              <img [src]="formData.profile_photo ? (formData.profile_photo | fileUrl) : ''" 
+                   alt="Photo de profil" 
                    class="preview-image"/>
-              <button type="button" class="btn btn-danger btn-sm remove-photo" (click)="removePhoto()">
-                <i class="fas fa-times"></i> Supprimer
-              </button>
             </div>
-            <div *ngIf="!formData.profilePhoto" class="upload-placeholder">
-              <label class="upload-label">
+            <div class="upload-area">
+              <label class="upload-button">
                 <input type="file" 
                        (change)="onFileSelected($event)" 
                        accept="image/*" 
-                       class="hidden-input">
-                <i class="fas fa-cloud-upload-alt"></i>
-                <span>Cliquez pour ajouter une photo</span>
+                       style="display: none;">
+                <i class="fas fa-camera"></i>
+                {{ formData.profile_photo ? 'Changer la photo' : 'Ajouter une photo' }}
               </label>
             </div>
           </div>
         </div>
 
-        <!-- Informations de contact -->
-        <div class="form-group mb-3">
-          <label for="location">Localisation *</label>
+        <!-- Numéro de téléphone -->
+        <div class="form-group">
+          <label for="phone_number">Numéro de téléphone</label>
           <div class="input-group">
-            <input type="text"
-                   class="form-control"
-                   id="location"
-                   name="location"
-                   [(ngModel)]="formData.location"
-                   required
-                   placeholder="Votre ville">
-            <span class="input-group-text">
-              <i class="fas fa-map-marker-alt"></i>
+            <span class="input-group-text country-code">
+              +228
             </span>
-          </div>
-        </div>
-
-        <div class="form-group mb-4">
-          <label for="phoneNumber">Numéro de téléphone *</label>
-          <div class="input-group">
             <input type="tel"
                    class="form-control"
-                   id="phoneNumber"
-                   name="phoneNumber"
-                   [(ngModel)]="formData.phoneNumber"
+                   id="phone_number"
+                   name="phone_number"
+                   [(ngModel)]="formData.phone_number"
                    required
-                   placeholder="+237 6XX XX XX XX">
-            <span class="input-group-text">
-              <i class="fas fa-phone"></i>
-            </span>
+                   placeholder="9X XX XX XX"
+                   pattern="^[9][0-9]{7}$"
+                   #phoneInput="ngModel">
+          </div>
+          <div class="error-message" *ngIf="phoneInput.invalid && (phoneInput.dirty || phoneInput.touched)">
+            <div *ngIf="phoneInput.errors?.['required']">Le numéro de téléphone est requis</div>
+            <div *ngIf="phoneInput.errors?.['pattern']">Le numéro doit commencer par 9 et avoir 8 chiffres (format: 9X XX XX XX)</div>
           </div>
         </div>
 
+        <!-- Disponibilité -->
+        <div class="form-group">
+          <label for="availability">Disponibilité</label>
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="fas fa-calendar"></i>
+            </span>
+            <textarea
+              class="form-control"
+              id="availability"
+              name="availability"
+              [(ngModel)]="formData.availability"
+              required
+              rows="3"
+              placeholder="Décrivez vos disponibilités (ex: Lundi-Vendredi, 9h-17h)"
+              #availabilityInput="ngModel">
+            </textarea>
+          </div>
+          <div class="error-message" *ngIf="availabilityInput.invalid && availabilityInput.touched">
+            Veuillez indiquer vos disponibilités
+          </div>
+        </div>
+
+        <!-- Boutons d'action -->
         <div class="modal-footer">
-          <button type="submit" 
-                  class="btn btn-primary" 
-                  [disabled]="!profileForm.form.valid">
-            <i class="fas fa-save"></i> Enregistrer
+          <button type="button" class="btn btn-secondary" (click)="onCancel()">
+            Plus tard
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="!profileForm.valid">
+            Enregistrer
           </button>
         </div>
       </form>

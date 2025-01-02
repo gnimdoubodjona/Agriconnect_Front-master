@@ -1,11 +1,18 @@
-<div class="app-container">
-  <div class="app-content">
-    <app-header></app-header>
-    <app-aside1></app-aside1>
-    <app-main>
-      <app-body></app-body>
-      <router-outlet></router-outlet>
-
-    </app-main>
+<ng-container *ngIf="!isAuthRoute">
+  <div class="app-container">
+    <div class="app-content">
+      <app-header></app-header>
+      <app-aside1></app-aside1>
+      <app-main>
+        <app-body></app-body>
+        <router-outlet></router-outlet>
+        <app-profile-completion-modal *ngIf="showProfileCompletion$ | async"></app-profile-completion-modal>
+      </app-main>
+    </div>
   </div>
-</div>
+</ng-container>
+
+<ng-container *ngIf="isAuthRoute">
+  <router-outlet></router-outlet>
+  <app-profile-completion-modal *ngIf="showProfileCompletion$ | async"></app-profile-completion-modal>
+</ng-container>

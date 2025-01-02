@@ -13,18 +13,25 @@ export class AppComponent implements OnInit {
   title = 'AgriconnetF';
   shouldShowHeaderFooter = true;
   showProfileModal = false;
+  isAuthRoute: boolean = false;
+  showProfileCompletion$;
 
   constructor(
     public authService: AuthService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private veterinaireService: VeterinaireService
-  ) {}
+  ) {
+    this.showProfileCompletion$ = this.authService.showProfileCompletion$;
+  }
 
   ngOnInit() {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
-    ).subscribe(() => {
+    ).subscribe((event: any) => {
+      // Mettre à jour isAuthRoute en fonction de l'URL actuelle
+      this.isAuthRoute = event.url === '/auth';
+
       // Par défaut, toujours afficher le header/footer
       this.shouldShowHeaderFooter = true;
       

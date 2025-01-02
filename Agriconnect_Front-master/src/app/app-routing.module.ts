@@ -22,7 +22,7 @@ const routes: Routes = [
     component: DashboardComponent,
     canActivate: [authGuard]
   },
-  
+
   // Page d'accueil publique
   {
     path: 'accueil',

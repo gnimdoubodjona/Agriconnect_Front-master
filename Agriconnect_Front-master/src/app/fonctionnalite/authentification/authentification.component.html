@@ -2,28 +2,118 @@
   <div class="auth-card">
     <div class="auth-header">
       <h2>{{ isLoginMode ? 'Bienvenue' : 'Rejoignez-nous' }}</h2>
-      <p class="auth-subtitle">{{ isLoginMode ? 'Connectez-vous à votre compte' : 'Créez votre compte vétérinaire' }}</p>
+      <p class="auth-subtitle">{{ isLoginMode ? 'Connectez-vous à votre compte' : 'Créez votre compte' }}</p>
     </div>
 
     <form (ngSubmit)="onSubmit()" #authForm="ngForm" class="auth-form">
-      <!-- Nom d'utilisateur -->
+      <!-- Champs pour l'inscription -->
+      <ng-container *ngIf="!isLoginMode">
+        <!-- Nom -->
+        <div class="form-group">
+          <label for="firstName">
+            <i class="fas fa-user"></i>
+            Nom
+          </label>
+          <input
+            type="text"
+            id="firstName"
+            name="firstName"
+            [(ngModel)]="registerCredentials.firstName"
+            placeholder="Entrez votre nom"
+            required
+            class="form-control"
+            #firstNameInput="ngModel"
+          >
+          <div class="error-message" *ngIf="firstNameInput.invalid && firstNameInput.touched">
+            Le nom est requis
+          </div>
+        </div>
+
+        <!-- Prénom -->
+        <div class="form-group">
+          <label for="lastName">
+            <i class="fas fa-user"></i>
+            Prénom
+          </label>
+          <input
+            type="text"
+            id="lastName"
+            name="lastName"
+            [(ngModel)]="registerCredentials.lastName"
+            placeholder="Entrez votre prénom"
+            required
+            class="form-control"
+            #lastNameInput="ngModel"
+          >
+          <div class="error-message" *ngIf="lastNameInput.invalid && lastNameInput.touched">
+            Le prénom est requis
+          </div>
+        </div>
+
+        <!-- Profession -->
+        <div class="form-group">
+          <label for="profession">
+            <i class="fas fa-briefcase"></i>
+            Profession
+          </label>
+          <input
+            type="text"
+            id="profession"
+            name="profession"
+            [(ngModel)]="registerCredentials.profession"
+            placeholder="Entrez votre profession"
+            required
+            class="form-control"
+            #professionInput="ngModel"
+          >
+          <div class="error-message" *ngIf="professionInput.invalid && professionInput.touched">
+            La profession est requise
+          </div>
+        </div>
+
+        <!-- Localisation -->
+        <div class="form-group">
+          <label for="location">
+            <i class="fas fa-map-marker-alt"></i>
+            Localisation
+          </label>
+          <input
+            type="text"
+            id="location"
+            name="location"
+            [(ngModel)]="registerCredentials.location"
+            placeholder="Entrez votre localisation"
+            required
+            class="form-control"
+            #locationInput="ngModel"
+          >
+          <div class="error-message" *ngIf="locationInput.invalid && locationInput.touched">
+            La localisation est requise
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Email (pour connexion et inscription) -->
       <div class="form-group">
-        <label for="username">
-          <i class="fas fa-user"></i>
-          Nom d'utilisateur
+        <label for="email">
+          <i class="fas fa-envelope"></i>
+          Adresse email
         </label>
         <input
-          type="text"
-          id="username"
-          name="username"
-          [(ngModel)]="credentials.username"
-          placeholder="Entrez votre nom d'utilisateur"
+          type="email"
+          id="email"
+          name="email"
+          [ngModel]="isLoginMode ? loginCredentials.email : registerCredentials.email"
+          (ngModelChange)="isLoginMode ? (loginCredentials.email = $event) : (registerCredentials.email = $event)"
+          placeholder="Entrez votre adresse email"
           required
+          email
           class="form-control"
-          #usernameInput="ngModel"
+          #emailInput="ngModel"
         >
-        <div class="error-message" *ngIf="usernameInput.invalid && usernameInput.touched">
-          Le nom d'utilisateur est requis
+        <div class="error-message" *ngIf="emailInput.invalid && emailInput.touched">
+          <span *ngIf="emailInput.errors?.['required']">L'adresse email est requise</span>
+          <span *ngIf="emailInput.errors?.['email']">L'adresse email n'est pas valide</span>
         </div>
       </div>
 
@@ -38,7 +128,8 @@
             [type]="passwordVisible ? 'text' : 'password'"
             id="password"
             name="password"
-            [(ngModel)]="credentials.password"
+            [ngModel]="isLoginMode ? loginCredentials.password : registerCredentials.password"
+            (ngModelChange)="isLoginMode ? (loginCredentials.password = $event) : (registerCredentials.password = $event)"
             placeholder="Entrez votre mot de passe"
             required
             minlength="6"
@@ -55,24 +146,44 @@
         </div>
       </div>
 
-      <!-- Message d'erreur global -->
-      <div class="error-message" *ngIf="error">
-        {{ error }}
+      <!-- Confirmation du mot de passe (inscription uniquement) -->
+      <div class="form-group" *ngIf="!isLoginMode">
+        <label for="confirmPassword">
+          <i class="fas fa-lock"></i>
+          Confirmer le mot de passe
+        </label>
+        <div class="password-wrapper">
+          <input
+            [type]="confirmPasswordVisible ? 'text' : 'password'"
+            id="confirmPassword"
+            name="confirmPassword"
+            [(ngModel)]="registerCredentials.confirmPassword"
+            placeholder="Confirmez votre mot de passe"
+            required
+            class="form-control"
+            #confirmPasswordInput="ngModel"
+          >
+          <span class="toggle-password" (click)="toggleConfirmPasswordVisibility()">
+            <i [class]="confirmPasswordVisible ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+          </span>
+        </div>
+        <div class="error-message" *ngIf="confirmPasswordInput.invalid && confirmPasswordInput.touched">
+          La confirmation du mot de passe est requise
+        </div>
       </div>
 
       <!-- Bouton de soumission -->
-      <button type="submit" class="submit-btn" [disabled]="!authForm.valid">
-        <i class="fas" [class.fa-sign-in-alt]="isLoginMode" [class.fa-user-plus]="!isLoginMode"></i>
-        {{ isLoginMode ? 'Se connecter' : "S'inscrire" }}
+      <button type="submit" class="auth-button" [disabled]="!authForm.valid">
+        {{ isLoginMode ? 'Se connecter' : 'S\'inscrire' }}
       </button>
 
-      <!-- Lien de changement de mode -->
-      <div class="mode-toggle">
+      <!-- Lien pour basculer entre connexion et inscription -->
+      <div class="toggle-mode" style="color: dark">
         <p>
-          {{ isLoginMode ? "Vous n'avez pas de compte ?" : "Vous avez déjà un compte ?" }}
-          <button type="button" class="mode-switch" (click)="toggleMode()">
-            {{ isLoginMode ? "S'inscrire" : 'Se connecter' }}
-          </button>
+          {{ isLoginMode ? 'Pas encore de compte ?' : 'Déjà un compte ?' }}
+          <a href="javascript:void(0)" (click)="toggleMode()">
+            {{ isLoginMode ? 'S\'inscrire' : 'Se connecter' }}
+          </a>
         </p>
       </div>
     </form>

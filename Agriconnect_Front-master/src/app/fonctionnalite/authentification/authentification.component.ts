@@ -16,9 +16,21 @@ export class AuthentificationComponent {
   isLoginMode = true;
   error = '';
   passwordVisible = false;
-  credentials: RegisterCredentials = {
-    username: '',
+  confirmPasswordVisible = false;
+
+  loginCredentials: LoginCredentials = {
+    email: '',
+    password: ''
+  };
+
+  registerCredentials: RegisterCredentials = {
+    firstName: '',
+    lastName: '',
+    email: '',
     password: '',
+    confirmPassword: '',
+    profession: '',
+    location: '',
     role: UserRole.Veterinaire
   };
 
@@ -41,54 +53,84 @@ export class AuthentificationComponent {
     this.passwordVisible = !this.passwordVisible;
   }
 
-  onSubmit(): void {
-    if (!this.authForm.valid) {
-      return;
+  toggleConfirmPasswordVisibility(): void {
+    this.confirmPasswordVisible = !this.confirmPasswordVisible;
+  }
+
+  validatePasswords(): boolean {
+    if (!this.isLoginMode) {
+      return this.registerCredentials.password === this.registerCredentials.confirmPassword;
     }
+    return true;
+  }
+
+  onSubmit(): void {
+    if (!this.authForm.valid) return;
 
     if (this.isLoginMode) {
-      this.authService.login(this.credentials).subscribe({
-        next: (response) => {
-          console.log('Connexion réussie:', response);
-          if (response.user.role === UserRole.Veterinaire && !response.user.profile_completed) {
-            // Si c'est un vétérinaire, rediriger vers le formulaire complet
-            this.router.navigate(['/veterinaire-profile']);
-          } else {
-            // Pour les autres rôles ou profils déjà complétés
-            this.router.navigate(['/dashboard']);
-          }
+      this.authService.login(this.loginCredentials).subscribe({
+        next: () => {
+          this.router.navigate(['/dashboard']);
         },
         error: (error) => {
           console.error('Erreur de connexion:', error);
-          this.error = error.error?.detail || 'Une erreur est survenue lors de la connexion';
+          Swal.fire({
+            icon: 'error',
+            title: 'Erreur de connexion',
+            text: 'Email ou mot de passe incorrect'
+          });
         }
       });
     } else {
-      this.authService.register(this.credentials).subscribe({
-        next: (response) => {
-          console.log('Inscription réussie:', response);
-          if (response.user.role === UserRole.Veterinaire) {
-            // Pour les vétérinaires, rediriger vers le formulaire complet
-            Swal.fire({
-              icon: 'success',
-              title: 'Inscription réussie!',
-              text: 'Veuillez compléter votre profil de vétérinaire.',
-              showConfirmButton: false,
-              timer: 2000
-            }).then(() => {
-              this.router.navigate(['/veterinaire-profile']);
-            });
-          } else {
-            // Pour les autres rôles, afficher le modal simple
-            this.authService.showProfileCompletion();
-            // Ne pas rediriger tant que le profil n'est pas complété
-          }
+      this.authService.register(this.registerCredentials).subscribe({
+        next: () => {
+          // Afficher d'abord le modal
+          this.authService.showProfileCompletion();
+          
+          // Puis afficher l'alerte qui se fermera automatiquement
+          Swal.fire({
+            icon: 'success',
+            title: 'Inscription réussie',
+            text: 'Veuillez compléter votre profil',
+            timer: 1500, // L'alerte se fermera automatiquement après 1.5 secondes
+            showConfirmButton: false
+          });
         },
         error: (error) => {
           console.error('Erreur d\'inscription:', error);
-          this.error = error.error?.detail || 'Une erreur est survenue lors de l\'inscription';
+          let errorMessage = 'Une erreur est survenue lors de l\'inscription.';
+          
+          if (error.error) {
+            if (typeof error.error === 'object') {
+              const errors = [];
+              for (const [key, value] of Object.entries(error.error)) {
+                errors.push(`${key}: ${value}`);
+              }
+              errorMessage = errors.join('\n');
+            } else if (typeof error.error === 'string') {
+              errorMessage = error.error;
+            }
+          }
+
+          Swal.fire({
+            icon: 'error',
+            title: 'Erreur d\'inscription',
+            text: errorMessage
+          });
         }
       });
     }
+  }
+
+  // Debug method to list all users
+  listUsers(): void {
+    this.authService.getAllUsers().subscribe({
+      next: (users) => {
+        console.log('Liste des utilisateurs:', users);
+      },
+      error: (error) => {
+        console.error('Erreur lors de la récupération des utilisateurs:', error);
+      }
+    });
   }
 }

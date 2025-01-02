@@ -8,7 +8,7 @@ import { isPlatformBrowser } from '@angular/common';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8000/api';
+  readonly apiUrl = 'http://localhost:8000/api';
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   currentUser$ = this.currentUserSubject.asObservable();
   private showProfileCompletionSubject = new BehaviorSubject<boolean>(false);
@@ -56,77 +56,101 @@ export class AuthService {
   }
 
   login(credentials: LoginCredentials): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login/`, credentials).pipe(
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login/`, credentials).pipe(
       tap(response => {
-        console.log('Login response:', response); // Debug
-        if (response.token) {
-          this.setLocalStorage('token', response.token);
-          this.setLocalStorage('currentUser', JSON.stringify(response.user));
-          this.currentUserSubject.next(response.user);
-        }
-      })
-    );
-  }
-
-  register(credentials: RegisterCredentials): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register/`, credentials).pipe(
-      tap(response => {
-        console.log('Register response:', response); // Debug
-        if (response.token) {
-          this.setLocalStorage('token', response.token);
-          this.setLocalStorage('currentUser', JSON.stringify(response.user));
-          this.currentUserSubject.next(response.user);
-          // Afficher le modal de complétion de profil
+        this.currentUserSubject.next(response.user);
+        this.setLocalStorage('currentUser', JSON.stringify(response.user));
+        this.setLocalStorage('token', response.token);
+        if (!response.user.profile_completed) {
           this.showProfileCompletionSubject.next(true);
         }
       })
     );
   }
 
-  logout(): void {
-    this.removeLocalStorage('token');
-    this.removeLocalStorage('currentUser');
-    this.currentUserSubject.next(null);
-    // Réinitialiser l'état du modal
-    this.showProfileCompletionSubject.next(false);
+  register(credentials: RegisterCredentials): Observable<AuthResponse> {
+    const registrationData = {
+      first_name: credentials.firstName,
+      last_name: credentials.lastName,
+      email: credentials.email,
+      password: credentials.password,
+      confirm_password: credentials.confirmPassword,
+      profession: credentials.profession,
+      location: credentials.location,
+      role: credentials.role.toLowerCase()
+    };
+
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register/`, registrationData).pipe(
+      tap(response => {
+        this.currentUserSubject.next(response.user);
+        this.setLocalStorage('currentUser', JSON.stringify(response.user));
+        this.setLocalStorage('token', response.token);
+        this.showProfileCompletionSubject.next(true);
+      })
+    );
   }
 
-  getToken(): string | null {
-    return this.getLocalStorage('token');
+  logout(): void {
+    this.currentUserSubject.next(null);
+    this.showProfileCompletionSubject.next(false);
+    this.removeLocalStorage('currentUser');
+    this.removeLocalStorage('token');
+  }
+
+  updateProfile(profileData: FormData): Observable<User> {
+    const token = this.getToken();
+    return this.http.patch<User>(
+      `${this.apiUrl}/auth/profile/`, 
+      profileData,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    ).pipe(
+      tap(user => {
+        this.currentUserSubject.next(user);
+        this.setLocalStorage('currentUser', JSON.stringify(user));
+        if (user.profile_completed) {
+          this.showProfileCompletionSubject.next(false);
+        }
+      })
+    );
+  }
+
+  getAllUsers(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.apiUrl}/auth/users/`);
   }
 
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
   }
 
-  isAuthenticated(): boolean {
-    const token = this.getToken();
-    return !!token;
+  getToken(): string | null {
+    return this.getLocalStorage('token');
   }
 
-  // Méthodes pour gérer l'affichage du modal de complétion de profil
-  showProfileCompletion(): void {
+  isAuthenticated(): boolean {
+    return !!this.getCurrentUser() && !!this.getToken();
+  }
+
+  public showProfileCompletion(): void {
     this.showProfileCompletionSubject.next(true);
   }
 
-  hideProfileCompletion(): void {
-    // Ne fermer le modal que si le profil est complété
-    const currentUser = this.getCurrentUser();
-    if (currentUser?.profile_completed) {
-      this.showProfileCompletionSubject.next(false);
-    }
+  public hideProfileCompletion(): void {
+    this.showProfileCompletionSubject.next(false);
+  }
+
+  public toggleProfileCompletion(): void {
+    const currentValue = this.showProfileCompletionSubject.value;
+    this.showProfileCompletionSubject.next(!currentValue);
   }
 
   closeProfileCompletion(): void {
-    // Ne fermer le modal que si le profil est complété
     const currentUser = this.getCurrentUser();
     if (currentUser?.profile_completed) {
       this.hideProfileCompletion();
     }
-  }
-
-  updateCurrentUser(user: User): void {
-    this.currentUserSubject.next(user);
-    this.setLocalStorage('currentUser', JSON.stringify(user));
   }
 }
